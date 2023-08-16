@@ -29,6 +29,26 @@
             border-right: 5px solid transparent;
             border-bottom: 5px solid currentColor;
         }
+
+        .content-paragraph {
+            max-width: 100%; /* Full width on small screens */
+            overflow-wrap: break-word; /* Breaks long words */
+        }
+
+        @media (min-width: 640px) {
+            /* For larger screens */
+            .content-paragraph {
+                max-width: 90%; /* You can adjust this value */
+            }
+        }
+
+        @media (min-width: 1024px) {
+            /* For even larger screens */
+            .content-paragraph {
+                /*max-width: 80%; !* You can adjust this value *!*/
+            }
+        }
+
     </style>
 @endpush
 
@@ -38,53 +58,56 @@
         <!-- Loop through each expandable section -->
         @foreach($tests as $test)
             <div class="expandable-section p-4 bg-white shadow rounded mb-4">
+
                 <div
-                    class="flex justify-between cursor-pointer"
+                    class="flex flex-col sm:flex-row  justify-between cursor-pointer mt-3"
                     onclick="toggleSection('section{{ $loop->index }}', 'icon{{ $loop->index }}')"
                 >
                     <h1
                         class="text-xl font-bold text-gray-600 flex flex-row items-center"
                     >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="w-6 h-6"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"
-                            />
-                        </svg
-                        >
+                        <!-- Your existing SVG and other content -->
                         &nbsp {{$test->system->name}}
                     </h1>
-                    <span id="icon{{ $loop->index }}" class="arrow-down"></span>
+                    <span id="icon{{ $loop->index }}" class="hidden sm:block arrow-down"></span>
                 </div>
                 <div id="section{{ $loop->index }}" class="hidden flex flex-col space-y-4">
-                    <p class="mt-8">Content for {{$test->system->name}}</p>
-                    <p class="mt-0">
+                    <div class="flex flex-col sm:flex-row justify-between items-start space-y-2 sm:space-y-0">
+                        <p class="mt-8 text-sm sm:text-base">Content for {{$test->system->name}}</p>
+                        @if(!auth()->user()->isAdmin() && !auth()->user()->tests()->where('test_id',$test->id)->wherePivot('completed', true)->exists())
+                            <button
+                                onclick="completeTest({{$test->system_id}},{{$test->id}} , {{auth()->user()->id}})"
+                                class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded-full text-xs ml-auto"
+                            >
+                                Complete
+                            </button>
+                        @else
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                            </svg>
+
+                        @endif
+                    </div>
+                    <p class="mt-0  text-sm sm:text-base break-all overflow-hidden content-paragraph">
                         {{$test->content}}
                     </p>
                     <div
-                        class="flex flex-col space-y-1 sm:space-y-0 sm:flex-row justify-between"
+                        class="flex flex-col space-y-2 sm:space-y-0 sm:flex-row justify-between"
                     >
                         <a
                             href="#"
-                            class="bg-green-500 w-auto text-center hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded"
+                            class="bg-green-500 w-full sm:w-auto text-center hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded text-sm sm:text-base"
                         >Create test on Usmlepreps</a
                         >
                         <a
                             href="#"
-                            class="bg-green-500 w-auto text-center hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded"
+                            class="bg-green-500 w-full sm:w-auto text-center hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded text-sm sm:text-base"
                         >
                             View Materials
                         </a>
                     </div>
                 </div>
+
             </div>
         @endforeach
     </div>
@@ -132,6 +155,45 @@
                 icon.classList.add("arrow-up");
             }
         }
+
+        function completeTest(systemId,testId, userId) {
+            // URL where you'll send the POST request
+            const url = `/complete-test/${testId}`;
+
+            // POST data
+            const data = {
+                test_id: testId,
+                user_id: userId,
+                system_id : systemId
+                // any other data you want to send
+            };
+
+            // Fetch options
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Include CSRF token if you're using Laravel
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+                body: JSON.stringify(data),
+            };
+
+            // Make the request
+            fetch(url, options)
+                .then(response => response.json())
+                .then(data => {
+                    // Handle success
+                    // For example, update the UI or show a success message
+                    console.log('Test marked as complete', data);
+                    location.href = '/tests/' + data.systemId;
+                })
+                .catch(error => {
+                    // Handle error
+                    console.error('An error occurred while marking the test as complete', error);
+                });
+        }
+
     </script>
 
 @endpush

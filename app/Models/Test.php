@@ -14,4 +14,11 @@ class Test extends Model
     public function system(){
         return $this->belongsTo(System::class);
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class)->withPivot('completed')->withTimestamps();
+    }
+
+
 }

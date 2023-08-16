@@ -12,7 +12,7 @@ class HomeController extends Controller
         return view('welcome' , ['systemObjects' => $systems]);
     }
 
-    public function viewDetails(){
+    public function viewDetails($id){
         return view('details');
     }
 }

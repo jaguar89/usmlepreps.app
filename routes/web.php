@@ -21,6 +21,12 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('admin')->group(function () {
         Route::get('/dashboard', function () {
+
+//            $user = \App\Models\User::find(2);
+//            $tests = \App\Models\Test::all();
+//            foreach ($tests as $test) {
+//                $user->tests()->attach($test->id, ['completed' => false]);
+//            }
             return view('dashboard');
         })->middleware(['verified'])->name('dashboard');
 
@@ -43,8 +49,10 @@ Route::middleware('auth')->group(function () {
         Route::put('/tests/{test}', [\App\Http\Controllers\TestController::class, 'store'])->name('tests.update');
     });
 
-//    Route::get('/tests', [\App\Http\Controllers\TestController::class, 'index'])->name('tests');
     Route::get('/tests/{id}', [\App\Http\Controllers\TestController::class, 'show']);
+    Route::post('/complete-test/{testId}', [\App\Http\Controllers\TestController::class, 'completeTest'])->name('complete.test');
+
+    Route::get('/view_tests/{id}', [\App\Http\Controllers\HomeController::class, 'viewDetails']);
 });
 
 require __DIR__ . '/auth.php';

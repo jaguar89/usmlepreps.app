@@ -43,7 +43,12 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function tests()
+    {
+        return $this->belongsToMany(Test::class)->withPivot('completed')->withTimestamps();
+    }
+
     public function isAdmin(){
-        return $this->isAdmin;
+        return $this->is_admin;
     }
 }

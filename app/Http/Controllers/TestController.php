@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\System;
 use App\Models\Test;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TestController extends Controller
 {
@@ -40,6 +42,8 @@ class TestController extends Controller
         $test->system_id = $request->system;
         $test->content = $request->test_content;
         $test->save();
+
+        $this->assignAllUserstoTest($test);
 
         return redirect()->route('tests')->with('success', 'Test content has been successfully added!');
     }
@@ -87,5 +91,22 @@ class TestController extends Controller
     {
         System::destroy($id);
         return redirect()->route('tests')->with('success', 'Test has been successfully deleted!');
+    }
+
+    public function completeTest($testId){
+        $userId = \request('user_id');
+       if(! $userId == Auth::user()->id)
+           return 'false';
+        $user = User::find($userId);
+        $user->tests()->attach($testId , ['completed' => true]);
+        return ['systemId' => \request('system_id')];
+    }
+
+    private function assignAllUserstoTest(Test $test)
+    {
+        $users = User::where('is_admin', false)->get();
+        foreach ($users as $user) {
+            $user->tests()->attach($test->id, ['completed' => false]);
+        }
     }
 }

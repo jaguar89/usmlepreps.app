@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>Laravel</title>
 
@@ -14,10 +15,10 @@
     @vite('resources/css/app.css')
     @stack('css')
 </head>
-<body class="antialiased">
+<body class="">
 
 <nav class="bg-teal-600 p-4">
-    <div class="container mx-auto flex items-center justify-between">
+    <div class="container mx-auto flex flex-col sm:flex-row items-center justify-between">
         <a
             href="{{url('/')}}"
             class="text-white text-2xl font-bold flex flex-row items-center"
