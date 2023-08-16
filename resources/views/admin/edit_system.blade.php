@@ -80,8 +80,8 @@
 
 
                 <div class=" p-6 rounded-lg ">
-                    <h1 class="text-2xl mb-4">Create System</h1>
-                    <form action="{{route('system.update' , $system)}}" method="POST" enctype="multipart/form-data">
+                    <h1 class="text-2xl mb-4">Update System</h1>
+                    <form action="{{route('systems.update' , $system)}}" method="POST" enctype="multipart/form-data">
                         @csrf <!-- Laravel CSRF token -->
                         @method('PUT')
                         <!-- Image Upload -->

@@ -81,7 +81,7 @@
 
             <div class=" p-6 rounded-lg ">
                 <h1 class="text-2xl mb-4">Create System</h1>
-                <form action="{{route('system.create')}}" method="POST" enctype="multipart/form-data">
+                <form action="{{route('systems.store')}}" method="POST" enctype="multipart/form-data">
                     @csrf <!-- Laravel CSRF token -->
                     <!-- Image Upload -->
                     <div class="mb-4">

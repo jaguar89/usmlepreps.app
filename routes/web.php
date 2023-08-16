@@ -30,13 +30,17 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/systems', [\App\Http\Controllers\SystemController::class, 'index'])->name('systems');
         Route::get('/systems/create', [\App\Http\Controllers\SystemController::class, 'create'])->name('systems.create');
-        Route::post('/systems', [\App\Http\Controllers\SystemController::class, 'store'])->name('system.create');
-        Route::put('/systems/{system}', [\App\Http\Controllers\SystemController::class, 'update'])->name('system.update');
-        Route::get('/systems/{system}', [\App\Http\Controllers\SystemController::class, 'edit'])->name('systems.edit');
+        Route::post('/systems', [\App\Http\Controllers\SystemController::class, 'store'])->name('systems.store');
+        Route::put('/systems/{system}', [\App\Http\Controllers\SystemController::class, 'update'])->name('systems.update');
+        Route::get('/systems/edit/{system}', [\App\Http\Controllers\SystemController::class, 'edit'])->name('systems.edit');
         Route::delete('/systems/{system}', [\App\Http\Controllers\SystemController::class, 'destroy'])->name('systems.destroy');
 
         Route::get('/tests', [\App\Http\Controllers\TestController::class, 'index'])->name('tests');
-        Route::post('/tests', [\App\Http\Controllers\TestController::class, 'store']);
+        Route::get('/tests/create', [\App\Http\Controllers\TestController::class, 'create'])->name('tests.create');
+        Route::get('/tests/edit/{test}', [\App\Http\Controllers\TestController::class, 'edit'])->name('tests.edit');
+        Route::delete('/tests/{test}', [\App\Http\Controllers\TestController::class, 'edit'])->name('tests.destroy');
+        Route::post('/tests', [\App\Http\Controllers\TestController::class, 'store'])->name('tests.store');
+        Route::put('/tests/{test}', [\App\Http\Controllers\TestController::class, 'store'])->name('tests.update');
     });
 
 //    Route::get('/tests', [\App\Http\Controllers\TestController::class, 'index'])->name('tests');

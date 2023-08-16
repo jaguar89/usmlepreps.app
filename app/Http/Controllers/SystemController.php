@@ -13,7 +13,7 @@ class SystemController extends Controller
     public function index()
     {
         $systems = System::paginate(9);
-        return view('admin.index', ['systems' => $systems]);
+        return view('admin.systems_index', ['systems' => $systems]);
     }
 
     /**
@@ -95,6 +95,6 @@ class SystemController extends Controller
     public function destroy(string $id)
     {
         System::destroy($id);
-        return redirect()->route('systems')->with('success', 'System object deleted successfully.');
+        return redirect()->route('systems')->with('success', 'System was deleted successfully.');
     }
 }

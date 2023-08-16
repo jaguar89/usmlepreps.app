@@ -13,8 +13,8 @@ class TestController extends Controller
      */
     public function index()
     {
-        $systems = System::all();
-        return view('admin.tests', ['systemObjects' => $systems]);
+        $tests = Test::paginate(9);
+        return view('admin.tests_index', ['tests' => $tests]);
     }
 
     /**
@@ -22,7 +22,8 @@ class TestController extends Controller
      */
     public function create()
     {
-        //
+        $systems = System::all();
+        return view('admin.create_test', ['systemObjects' => $systems]);
     }
 
     /**
@@ -41,7 +42,6 @@ class TestController extends Controller
         $test->save();
 
         return redirect()->route('tests')->with('success', 'Test content has been successfully added!');
-
     }
 
     /**
@@ -57,17 +57,27 @@ class TestController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Test $test)
     {
-        //
+        $systems = System::all();
+        return view('admin.edit_test', ['test' => $test , 'systemObjects' => $systems]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Test $test)
     {
-        //
+        $request->validate([
+            'system' => 'required|string',
+            'test_content' => 'required|string',
+        ]);
+
+        $test->system_id = $request->system;
+        $test->content = $request->test_content;
+        $test->save();
+
+        return redirect()->route('tests')->with('success', 'Test content has been successfully updated!');
     }
 
     /**
@@ -75,6 +85,7 @@ class TestController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        System::destroy($id);
+        return redirect()->route('tests')->with('success', 'Test has been successfully deleted!');
     }
 }

@@ -18,7 +18,7 @@
                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     All Tests
                 </a>
-                <a href="#"
+                <a href="{{ route('tests.create') }}"
                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                     Create Test
                 </a>
@@ -62,14 +62,14 @@
                             class="max-w-sm w-full bg-red-100 shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
                             <div class="p-4">
                                 <div class="flex items-start">
-                                    <div class="flex-shrink-0">
-                                        <!-- Error Icon -->
-                                        <svg class="h-6 w-6 text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                             viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                                  d="M6 18L18 6M6 6l12 12"/>
-                                        </svg>
-                                    </div>
+                                    {{--                                    <div class="flex-shrink-0">--}}
+                                    {{--                                        <!-- Error Icon -->--}}
+                                    {{--                                        <svg class="h-6 w-6 text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none"--}}
+                                    {{--                                             viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">--}}
+                                    {{--                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"--}}
+                                    {{--                                                  d="M6 18L18 6M6 6l12 12"/>--}}
+                                    {{--                                        </svg>--}}
+                                    {{--                                    </div>--}}
                                     <div class="ml-3 w-0 flex-1 pt-0.5">
                                         <p class="text-sm font-medium text-red-800">
                                             There were some errors with your submission:
@@ -99,9 +99,10 @@
                     </div>
                 @endif
 
-                <div class="container mx-auto mt-10">
-                    <form action="/tests" method="POST"
-                          class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+                <div class="p-6 rounded-lg">
+                    <h1 class="text-2xl mb-4  text-center">Create Test</h1>
+                    <form action="{{route('tests.store')}}" method="POST"
+                          class="">
                         @csrf
                         <div class="mb-4">
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="system">
