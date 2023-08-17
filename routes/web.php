@@ -14,10 +14,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [\App\Http\Controllers\HomeController::class, 'index']);
+
 
 
 Route::middleware('auth')->group(function () {
+
+    Route::get('/', [\App\Http\Controllers\HomeController::class, 'index']);
 
     Route::middleware('admin')->group(function () {
         Route::get('/dashboard', function () {
@@ -47,6 +49,12 @@ Route::middleware('auth')->group(function () {
         Route::delete('/tests/{test}', [\App\Http\Controllers\TestController::class, 'edit'])->name('tests.destroy');
         Route::post('/tests', [\App\Http\Controllers\TestController::class, 'store'])->name('tests.store');
         Route::put('/tests/{test}', [\App\Http\Controllers\TestController::class, 'store'])->name('tests.update');
+
+
+        Route::get('/videos', [\App\Http\Controllers\VideoController::class, 'index'])->name('videos');
+        Route::post('/videos', [\App\Http\Controllers\VideoController::class, 'store'])->name('videos.create');
+        Route::delete('/videos/{id}', [\App\Http\Controllers\VideoController::class, 'destroy'])->name('videos.destroy');
+
     });
 
     Route::get('/tests/{id}', [\App\Http\Controllers\TestController::class, 'show']);

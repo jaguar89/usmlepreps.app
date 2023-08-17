@@ -16,7 +16,7 @@ class TestController extends Controller
     public function index()
     {
         $tests = Test::paginate(9);
-        return view('admin.tests_index', ['tests' => $tests]);
+        return view('admin.tests', ['tests' => $tests]);
     }
 
     /**

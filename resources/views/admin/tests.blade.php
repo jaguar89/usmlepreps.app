@@ -84,7 +84,9 @@
                 @endforeach
                 </tbody>
             </table>
-
+                <div class="mt-4">
+                    {{ $tests->links() }} <!-- Pagination links -->
+                </div>
 
         </div>
     </div>

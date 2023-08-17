@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\System;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class SystemController extends Controller
 {
@@ -13,7 +14,7 @@ class SystemController extends Controller
     public function index()
     {
         $systems = System::paginate(9);
-        return view('admin.systems_index', ['systems' => $systems]);
+        return view('admin.systems', ['systems' => $systems]);
     }
 
     /**
@@ -94,7 +95,15 @@ class SystemController extends Controller
      */
     public function destroy(string $id)
     {
-        System::destroy($id);
-        return redirect()->route('systems')->with('success', 'System was deleted successfully.');
+        $system = System::find($id);
+        if ($system) {
+            $imagePath = $system->image_path;
+            if ($imagePath && Storage::exists($imagePath)) {
+                Storage::delete($imagePath);
+            }
+            $system->delete();
+            return redirect()->route('systems')->with('success', 'System was deleted successfully.');
+        }
+        return redirect()->route('systems');
     }
 }
