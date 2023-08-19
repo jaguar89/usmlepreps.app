@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\System;
+use App\Models\Test;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -13,6 +14,7 @@ class HomeController extends Controller
     }
 
     public function viewDetails($id){
-        return view('details');
+        $tests = Test::where('system_id' , $id)->get();
+        return view('details' , ['tests' => $tests]);
     }
 }

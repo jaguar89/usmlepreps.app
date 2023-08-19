@@ -19,7 +19,7 @@
                         {{ __('Systems') }}
                     </x-nav-link>
                     <x-nav-link :href="route('tests')" :active="request()->routeIs('tests')">
-                        {{ __('Tests') }}
+                        {{ __('Tasks') }}
                     </x-nav-link>
                     <x-nav-link :href="route('videos')" :active="request()->routeIs('videos')">
                         {{ __('Videos') }}

@@ -17,9 +17,13 @@ use Illuminate\Support\Facades\Route;
 
 
 
+Route::get('/', [\App\Http\Controllers\HomeController::class, 'index']);
+Route::get('/view_tests/{id}', [\App\Http\Controllers\HomeController::class, 'viewDetails']);
+Route::get('/download-material/{test}',  [\App\Http\Controllers\TestController::class, 'downloadMaterial'])->name('download-material');
+
+
 Route::middleware('auth')->group(function () {
 
-    Route::get('/', [\App\Http\Controllers\HomeController::class, 'index']);
 
     Route::middleware('admin')->group(function () {
         Route::get('/dashboard', function () {
@@ -46,9 +50,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/tests', [\App\Http\Controllers\TestController::class, 'index'])->name('tests');
         Route::get('/tests/create', [\App\Http\Controllers\TestController::class, 'create'])->name('tests.create');
         Route::get('/tests/edit/{test}', [\App\Http\Controllers\TestController::class, 'edit'])->name('tests.edit');
-        Route::delete('/tests/{test}', [\App\Http\Controllers\TestController::class, 'edit'])->name('tests.destroy');
+        Route::delete('/tests/{test}', [\App\Http\Controllers\TestController::class, 'destroy'])->name('tests.destroy');
         Route::post('/tests', [\App\Http\Controllers\TestController::class, 'store'])->name('tests.store');
-        Route::put('/tests/{test}', [\App\Http\Controllers\TestController::class, 'store'])->name('tests.update');
+        Route::put('/tests/{test}', [\App\Http\Controllers\TestController::class, 'update'])->name('tests.update');
 
 
         Route::get('/videos', [\App\Http\Controllers\VideoController::class, 'index'])->name('videos');
@@ -59,8 +63,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/tests/{id}', [\App\Http\Controllers\TestController::class, 'show']);
     Route::post('/complete-test/{testId}', [\App\Http\Controllers\TestController::class, 'completeTest'])->name('complete.test');
+    Route::post('/incomplete-test/{testId}', [\App\Http\Controllers\TestController::class, 'incompleteTest'])->name('complete.test');
 
-    Route::get('/view_tests/{id}', [\App\Http\Controllers\HomeController::class, 'viewDetails']);
+
 });
 
 require __DIR__ . '/auth.php';

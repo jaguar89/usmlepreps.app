@@ -11,16 +11,16 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                {{ __('Tests') }}
+                {{ __('Tasks') }}
             </h2>
             <nav class="flex space-x-4">
                 <a href="{{ route('tests') }}"
                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    All Tests
+                    All Tasks
                 </a>
                 <a href="{{ route('tests.create') }}"
                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                    Create Test
+                    Create Task
                 </a>
             </nav>
         </div>
@@ -62,14 +62,6 @@
                             class="max-w-sm w-full bg-red-100 shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
                             <div class="p-4">
                                 <div class="flex items-start">
-                                    {{--                                    <div class="flex-shrink-0">--}}
-                                    {{--                                        <!-- Error Icon -->--}}
-                                    {{--                                        <svg class="h-6 w-6 text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none"--}}
-                                    {{--                                             viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">--}}
-                                    {{--                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"--}}
-                                    {{--                                                  d="M6 18L18 6M6 6l12 12"/>--}}
-                                    {{--                                        </svg>--}}
-                                    {{--                                    </div>--}}
                                     <div class="ml-3 w-0 flex-1 pt-0.5">
                                         <p class="text-sm font-medium text-red-800">
                                             There were some errors with your submission:
@@ -101,8 +93,7 @@
 
                 <div class="p-6 rounded-lg">
                     <h1 class="text-2xl mb-4  text-center">Create Test</h1>
-                    <form action="{{route('tests.store')}}" method="POST"
-                          class="">
+                    <form action="{{route('tests.store')}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-4">
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="system">
@@ -122,6 +113,18 @@
                             <textarea name="test_content" id="test-content"
                                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                       rows="5"></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="material">
+                                upload materials (*.zip , *.rar):
+                            </label>
+                            <input type="file" id="material" name="material" class="mt-1 p-2 w-full border rounded-md">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="questions_ids">
+                                Question IDs (comma separated numbers):
+                            </label>
+                            <input type="text" id="questions_ids" name="questions_ids" class="mt-1 p-2 w-full border rounded-md">
                         </div>
                         <div class="flex items-center justify-between">
                             <button type="submit"
