@@ -49,6 +49,26 @@
             }
         }
 
+        .tooltip-link {
+            position: relative;
+        }
+
+        .tooltip-link:hover:after {
+            content: attr(data-tooltip);
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%); /* Centering the tooltip */
+            padding: 0.5rem; /* Increasing padding */
+            border-radius: 0.5rem; /* Larger border radius */
+            background-color: #333; /* Dark background */
+            color: #fff; /* White text */
+            font-size: 0.875rem; /* Larger font size */
+            white-space: nowrap;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Adding a shadow for a bit of depth */
+        }
+
     </style>
 @endpush
 
@@ -57,7 +77,8 @@
     <div class="container mx-auto p-10 content">
         <!-- Flash messages section -->
         @if (session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-4 rounded relative alert" role="alert">
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-4 rounded relative alert"
+                 role="alert">
                 <span class="block sm:inline">{{ session('error') }}</span>
                 <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" onclick="closeErrorMessage()">
             <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg"
@@ -71,24 +92,35 @@
         @endif
         <!-- Loop through each expandable section -->
         @foreach($tests as $test)
-            <div class="expandable-section p-4 bg-white shadow rounded mb-4">
-
+            <div class="expandable-section p-4 bg-white shadow rounded mb-4" id="title-{{$test->title}}">
                 <div
                     class="flex flex-col sm:flex-row  justify-between cursor-pointer mt-3"
                     onclick="toggleSection('section{{ $loop->index }}', 'icon{{ $loop->index }}')"
                 >
-                    <h1
-                        class="text-xl font-bold text-gray-600 flex flex-row items-center"
-                    >
-                        <!-- Your existing SVG and other content -->
-                        &nbsp {{$test->system->name}}
-                    </h1>
+                      <h1
+                          class="text-xl font-bold text-gray-600 flex flex-row items-center"
+                      >
+                          <!-- Your existing SVG and other content -->
+                          &nbsp {{$test->system->name}}
+                      </h1>
+
                     <span id="icon{{ $loop->index }}" class="hidden sm:block arrow-down"></span>
                 </div>
+
                 <div id="section{{ $loop->index }}" class="hidden flex flex-col space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start space-y-2 sm:space-y-0">
-                        <p class="mt-8 text-sm sm:text-base">Content for {{$test->system->name}}</p>
-                        @auth()
+                        <div class="p-4 bg-gray-200 rounded">
+                             <p class="text-sm sm:text-base">
+                               Task Title:
+                            <div onclick="copyLink({{$test->id}}, '{{'title-' . $test->title}}')" data-tooltip="Generate URL" class="tooltip-link bg-amber-200 p-1 rounded hover:bg-amber-300 cursor-pointer">
+                                {{$test->title}}
+                            </div>
+                            </p>
+
+                        </div>
+
+
+                    @auth()
                             @if(!auth()->user()->isAdmin() && !auth()->user()->tests()->where('test_id',$test->id)->wherePivot('completed', true)->exists())
                                 <button
                                     onclick="completeTest({{$test->system_id}},{{$test->id}} , {{auth()->user()->id}})"
@@ -113,19 +145,19 @@
                             @endif
                         @endauth
                     </div>
-                    <p class="mt-0  text-sm sm:text-base break-all overflow-hidden content-paragraph">
+                    <p class="mt-0 text-sm sm:text-base break-all overflow-hidden content-paragraph">
                         {!! $test->content !!}
                     </p>
                     <div
                         class="flex flex-col space-y-2 sm:space-y-0 sm:flex-row justify-between"
                     >
                         <a
-                            href="#"
+                            onclick="createTestOnUsmlepreps({ ids: {{ json_encode( $test->questions_ids) }} })"
                             class="bg-green-500 w-full sm:w-auto text-center hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded text-sm sm:text-base"
                         >Create test on Usmlepreps</a
                         >
                         <a
-                            href="{{ route('download-material', ['test' => $test]) }}"
+                            href="{{ route('download.material', ['test' => $test]) }}"
                             class="bg-green-500 w-full sm:w-auto text-center hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded text-sm sm:text-base flex items-center justify-center"
                         >
                             <i class="fas fa-download mr-2"></i> View Materials
@@ -135,6 +167,9 @@
 
             </div>
         @endforeach
+
+        <input type="hidden" name="request_api_url" id="request_api_url" value="{{env('REQUEST_USMLEPREPS_API_URL')}}">
+
     </div>
 
 @endsection
@@ -211,7 +246,7 @@
                     // Handle success
                     // For example, update the UI or show a success message
                     console.log('Test marked as complete', data);
-                    location.href = '/view_tests/' + data.systemId;
+                    location.href = '/view-tasks/' + data.systemId;
                 })
                 .catch(error => {
                     // Handle error
@@ -245,7 +280,7 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log('Test marked as incomplete', data);
-                    location.href = '/view_tests/' + data.systemId;
+                    location.href = '/view-tasks/' + data.systemId;
                 })
                 .catch(error => {
                     // Handle error
@@ -259,6 +294,44 @@
             if (alert) {
                 alert.remove();
             }
+        }
+
+        function createTestOnUsmlepreps(data) {
+            const url = document.getElementById('request_api_url').value;
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Include CSRF token if you're using Laravel
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+                body: JSON.stringify(data),
+            };
+            fetch(url, options)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('I got a response with : ', data);
+                    location.href = data.url;
+                })
+                .catch(error => {
+                    // Handle error
+                    console.error('An error occurred while marking the test as complete', error);
+                });
+        }
+
+        function copyLink(testId , title) {
+            var encodedTitle = encodeURIComponent('id='+testId +'&title='+ title);
+            var baseUrl = window.location.protocol + '//' + window.location.host;
+            var link = baseUrl + '/view-single-task/' + encodedTitle;
+
+            // Now you can copy 'link' to the clipboard
+            // Here's how you might do that:
+            navigator.clipboard.writeText(link).then(function() {
+                console.log('Link copied to clipboard:', link);
+            }).catch(function(err) {
+                console.error('Failed to copy link:', err);
+            });
+            alert('Link copied to clipboard!'); // Optionally notify the user
         }
 
     </script>

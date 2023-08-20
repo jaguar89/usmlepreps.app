@@ -18,4 +18,19 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+
+    # Enable Byte-Range Requests
+    Header set Accept-Ranges bytes
+    # Enable Caching
+    ExpiresActive On
+    ExpiresDefault "access plus 1 year"
+
+    <Files ~ "\.mp4$">
+        Header set Accept-Ranges bytes
+        # Specific caching for MP4 files
+        ExpiresDefault "access plus 1 year"
+    </Files>
+
+    AddType video/mp4 .mp4
+
 </IfModule>

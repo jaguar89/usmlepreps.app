@@ -7,29 +7,81 @@
     @push('script')
         <script src="https://vjs.zencdn.net/7.11.4/video.js"></script>
         <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                // Existing code to initialize the player
-                const player = videojs('my-video');
+            // Declare a JavaScript array to store the video URLs
+            const videosArray = @json($videos->map(function ($video) {
+        // Use Laravel's asset function to create the full URL
+        return asset('storage/' . $video->path);
+    }));
 
-                // Add click event listener for each video item
-                document.querySelectorAll('.video-item').forEach(item => {
-                    item.addEventListener('click', function () {
-                        // Get the video URL from the clicked item
-                        const videoSrc = this.getAttribute('data-video-src');
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize the player
+        const player = videojs('my-video');
 
-                        // Update the player's source
-                        player.src({
-                            type: 'video/mp4',
-                            src: videoSrc
-                        });
-
-                        // Optionally, you can play the video automatically
-                        player.play();
-                    });
-                });
+        // If there are videos, set the first one as the source and play
+        if (videosArray.length > 0) {
+            player.src({
+                type: 'video/mp4',
+                src: videosArray[0] // The first video URL
             });
+            player.play();
+        }
 
+        // Add click event listener for each video item
+        document.querySelectorAll('.video-item').forEach((item, index) => {
+            item.addEventListener('click', function () {
+                // Get the video URL from the videosArray
+                const videoSrc = videosArray[index];
+
+                // Update the player's source
+                player.src({
+                    type: 'video/mp4',
+                    src: videoSrc
+                });
+
+                // Optionally, you can play the video automatically
+                player.play();
+            });
+        });
+            })
+            ;
+
+            function copyLink(link) {
+                var dummy = document.createElement('input');
+                document.body.appendChild(dummy);
+                dummy.value = link;
+                dummy.select();
+                document.execCommand('copy');
+                document.body.removeChild(dummy);
+                alert('Link copied to clipboard!'); // Optionally notify the user
+            }
         </script>
+
+        {{--        <script>--}}
+
+        {{--            document.addEventListener('DOMContentLoaded', () => {--}}
+        {{--                // Existing code to initialize the player--}}
+        {{--                const player = videojs('my-video');--}}
+
+        {{--                // Add click event listener for each video item--}}
+        {{--                document.querySelectorAll('.video-item').forEach(item => {--}}
+        {{--                    item.addEventListener('click', function () {--}}
+        {{--                        // Get the video URL from the clicked item--}}
+        {{--                        const videoSrc = this.getAttribute('data-video-src');--}}
+
+        {{--                        // Update the player's source--}}
+        {{--                        player.src({--}}
+        {{--                            type: 'video/mp4',--}}
+        {{--                            src: videoSrc--}}
+        {{--                        });--}}
+
+        {{--                        // Optionally, you can play the video automatically--}}
+        {{--                        player.play();--}}
+        {{--                    });--}}
+        {{--                });--}}
+        {{--            })--}}
+        {{--            ;--}}
+
+        {{--        </script>--}}
     @endpush
     <x-slot name="header">
         <div class="flex justify-between items-center">
@@ -149,7 +201,6 @@
                     preload="auto"
                     width="640"
                     height="360"
-                    poster="path-to-your-poster.jpg"
                     data-setup='{}'
                 >
                     <!-- Source for the video file -->
@@ -179,7 +230,7 @@
                         <li class="video-item cursor-pointer mb-4 flex justify-between items-center hover:bg-gray-200 transition-all duration-200 ease-in-out border border-gray-300 rounded shadow-sm"
                             data-video-src="{{ asset('storage/' . $video->path) }}">
                             <!-- Thumbnail and Title -->
-                            <div class="flex items-center p-2">
+                            <div class="flex items-center p-2 w-3/4">
                                 @if($video->thumbnail)
                                     <img src="{{ asset('storage/' . $video->thumbnail) }}" alt="Video Thumbnail"
                                          class="w-16 h-9 inline-block mr-2"/>
@@ -189,18 +240,29 @@
                                 @endif
                                 <span>{{$video->title}}</span>
                             </div>
-
-                            <!-- Delete Button -->
-                            <form action="{{ route('videos.destroy', $video->id) }}" method="POST" class="p-2">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-500 hover:text-red-700">
-                                    Delete
+                            <div class="flex flex-col items-center p-2 justify-between h-full space-y-2">
+                                <!-- Generate Link Button -->
+                                <button onclick="copyLink('{{ asset('storage/' . $video->path) }}')"
+                                        class="text-white text-center bg-purple-400 hover:bg-purple-600 text-xs px-1 py-0.5 mb-1 rounded">
+                                    Copy Link
                                 </button>
-                            </form>
+
+                                <!-- Delete Button -->
+                                <form action="{{ route('videos.destroy', $video->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="text-white bg-red-500 hover:bg-red-700 text-xs px-1 py-0.5 rounded">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+
                         </li>
                     @endforeach
                 </ul>
+
+
                 <!-- Render pagination links -->
                 <div class="mt-4">
                     {{ $videos->links() }}

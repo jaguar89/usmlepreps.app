@@ -59,15 +59,17 @@
                 <thead>
                 <tr>
                     <th class="w-24 py-2 px-4 border-b">Test ID</th>
-                    <th class="py-2 px-4 border-b">System Name</th>
+                    <th class="w-1/2 py-2 px-4 border-b">System Name</th>
+                    <th class="w-1/2 py-2 px-4 border-b">Task Title</th>
                     <th class="w-24 py-2 px-4 border-b">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($tests as $test)
                     <tr>
-                        <td class="py-2 px-4 border-b">{{ $test->id }}</td>
-                        <td class="py-2 px-4 border-b">{{ $test->system->name }}</td>
+                        <td class="py-2 px-4 border-b border-r">{{ $test->id }}</td>
+                        <td class="py-2 px-4 border-b border-r text-center">{{ $test->system->name }}</td>
+                        <td class="py-2 px-4 border-b border-r text-center">{{ $test->title }}</td>
                         <td class="py-2 px-4 flex justify-around items-center space-x-4 {{($loop->index == 0) ? '' : 'border-t'}}">
                             <a href="{{ route('tests.edit', $test) }}"
                                class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Edit</a>

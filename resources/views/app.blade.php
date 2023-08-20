@@ -47,6 +47,10 @@
                                class="font-semibold  hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Dashboard</a>
                         @else
                             <span class="mr-4">Welcome, {{ Auth::user()->name }}!</span>
+                            <a href="{{ route('view.videos') }}"
+                               class="py-2 px-4 bg-amber-400 text-white rounded-full hover:bg-amber-600 inline-block">
+                                Browse All Videos!
+                            </a>
                             <a href="{{ route('logout') }}"
                                class="text-gray-100 bg-red-400 hover:bg-red-600 transition-all duration-300 ease-in-out py-2 px-4 rounded-full inline-flex items-center"
                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

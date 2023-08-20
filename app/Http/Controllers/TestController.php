@@ -37,6 +37,7 @@ class TestController extends Controller
     {
         $request->validate([
             'system' => 'required|string',
+            'title' => 'required|string',
             'test_content' => 'required|string',
             'material' => 'nullable|file|mimes:zip,rar',
             'questions_ids' => 'nullable|string|regex:/^\d+(,\d+)*$/',
@@ -51,7 +52,8 @@ class TestController extends Controller
         }
 
         $test->system_id = $request->system;
-        $test->content = $request->test_content;
+        $test->title = $request->title;
+        $test->content =$request->test_content;
         $test->questions_ids = $request->has('questions_ids') ? $request->input('questions_ids') : null;
         $test->save();
 
@@ -86,6 +88,7 @@ class TestController extends Controller
     {
         $request->validate([
             'system' => 'required|string',
+            'title' => 'required|string',
             'test_content' => 'required|string',
             'material' => 'nullable|file|mimes:zip,rar',
             'questions_ids' => 'nullable|string|regex:/^\d+(,\d+)*$/',
@@ -100,6 +103,7 @@ class TestController extends Controller
         }
 
         $test->system_id = $request->system;
+        $test->title = $request->title;
         $test->content = $request->test_content;
         $test->questions_ids = $request->has('questions_ids') ? $request->input('questions_ids') : null;
         $test->save();

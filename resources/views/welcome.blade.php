@@ -14,9 +14,13 @@
             <div>
                 <h2 class="text-2xl font-semibold mb-4">Signup now to track your progress!</h2>
                 <p class="text-gray-600">Join us and take control of your journey.</p>
-                <a href="{{ route('register') }}"
-                   class="mt-4 px-6 py-2 bg-teal-500 text-white rounded-full hover:bg-teal-600 inline-block">Get
-                    Started</a>
+{{--                <a href="{{ route('register') }}"--}}
+{{--                   class="mt-4 px-6 py-2 bg-teal-500 text-white rounded-full hover:bg-teal-600 inline-block">Get--}}
+{{--                    Started</a>--}}
+                <a href="{{ route('view.videos') }}"
+                   class="mt-4 px-6 py-2 bg-teal-500 text-white rounded-full hover:bg-teal-600 inline-block">
+                    Browse All Videos!
+                </a>
             </div>
         @endguest
         <!-- Content -->
@@ -26,22 +30,22 @@
             <!-- New cards with statistics -->
             <div class="bg-white p-6 shadow rounded-lg">
                 <h2 class="text-xl font-semibold mb-2">Total Users</h2>
-                <p class="text-gray-700 text-3xl font-bold">2350</p>
+                <p class="text-gray-700 text-3xl font-bold">{{$totalUsers}}</p>
             </div>
 
             <div class="bg-white p-6 shadow rounded-lg">
                 <h2 class="text-xl font-semibold mb-2">Total Systems</h2>
-                <p class="text-gray-700 text-3xl font-bold">120</p>
+                <p class="text-gray-700 text-3xl font-bold">{{$totalSystems}}</p>
             </div>
 
             <div class="bg-white p-6 shadow rounded-lg">
                 <h2 class="text-xl font-semibold mb-2">Total Tasks</h2>
-                <p class="text-gray-700 text-3xl font-bold">550</p>
+                <p class="text-gray-700 text-3xl font-bold">{{$totalTasks}}</p>
             </div>
 
             <div class="bg-white p-6 shadow rounded-lg">
                 <h2 class="text-xl font-semibold mb-2">Total Videos</h2>
-                <p class="text-gray-700 text-3xl font-bold">780</p>
+                <p class="text-gray-700 text-3xl font-bold">{{$totalVideos}}</p>
             </div>
         </div>
     </div>
@@ -95,7 +99,7 @@
                     </div>
                 @endauth
                 <a
-                    href="{{url('/view_tests/'. $systemObject->id)}}"
+                    href="{{route('view.tests' , $systemObject->id)}}"
                     class="bg-green-500 text-white font-bold py-2 px-4 mt-4 block text-center rounded hover:bg-green-400"
                 >View More</a
                 >

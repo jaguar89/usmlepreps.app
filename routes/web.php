@@ -18,8 +18,10 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', [\App\Http\Controllers\HomeController::class, 'index']);
-Route::get('/view_tests/{id}', [\App\Http\Controllers\HomeController::class, 'viewDetails']);
-Route::get('/download-material/{test}',  [\App\Http\Controllers\TestController::class, 'downloadMaterial'])->name('download-material');
+Route::get('/view-tasks/{id}', [\App\Http\Controllers\HomeController::class, 'viewSystemTasks'])->name('view.tests');
+Route::get('/view-single-task/{params}', [\App\Http\Controllers\HomeController::class, 'viewSingleTask'])->name('view.test.blank');
+Route::get('/view-all-videos',  [\App\Http\Controllers\HomeController::class, 'viewAllVideos'])->name('view.videos');
+Route::get('/download-material/{test}',  [\App\Http\Controllers\TestController::class, 'downloadMaterial'])->name('download.material');
 
 
 Route::middleware('auth')->group(function () {
