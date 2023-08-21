@@ -1,9 +1,9 @@
 @extends('app')
-    @push('css')
+@push('css')
 
-        <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet"/>
+    <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet"/>
 
-    @endpush
+@endpush
 
 @section('content')
 
@@ -21,7 +21,7 @@
                     data-setup='{}'
                 >
                     <!-- Source for the video file -->
-                    <source src="#" type="video/mp4"/>
+                    <source src="https://youtu.be/U5rLz5AZBIA" type="video/mp4"/>
 
                     <!-- Fallback message for browsers that do not support HTML5 video -->
                     <p class="vjs-no-js">
@@ -34,7 +34,7 @@
 
             <!-- Playlist Container -->
             <div class="w-full lg:w-1/3 p-4">
-                <p>List of all videos:</p>
+                <p>You are watching:</p>
                 <!-- List of Videos -->
                 <ul>
                     @foreach($videos as $video)
@@ -55,12 +55,6 @@
                     @endforeach
                 </ul>
 
-
-                <!-- Render pagination links -->
-                <div class="mt-4">
-                    {{ $videos->links() }}
-                </div>
-
             </div>
         </div>
     </div>
@@ -71,50 +65,40 @@
     <script>
         // Declare a JavaScript array to store the video URLs
         const videosArray = @json($videos->map(function ($video) {
-        // Use Laravel's asset function to create the full URL
-        return asset('storage/' . $video->path);
-    }));
+                // Use Laravel's asset function to create the full URL
+                return asset('storage/' . $video->path);
+            }));
 
-    document.addEventListener('DOMContentLoaded', () => {
-        // Initialize the player
-        const player = videojs('my-video');
+            document.addEventListener('DOMContentLoaded', () => {
+                // Initialize the player
+                const player = videojs('my-video');
 
-        // If there are videos, set the first one as the source and play
-        if (videosArray.length > 0) {
-            player.src({
-                type: 'video/mp4',
-                src: videosArray[0] // The first video URL
-            });
-            player.play();
-        }
+                // If there are videos, set the first one as the source and play
+                if (videosArray.length > 0) {
+                    player.src({
+                        type: 'video/mp4',
+                        src: videosArray[0] // The first video URL
+                    });
+                    player.play();
+                }
 
-        // Add click event listener for each video item
-        document.querySelectorAll('.video-item').forEach((item, index) => {
-            item.addEventListener('click', function () {
-                // Get the video URL from the videosArray
-                const videoSrc = videosArray[index];
+                // Add click event listener for each video item
+                document.querySelectorAll('.video-item').forEach((item, index) => {
+                    item.addEventListener('click', function () {
+                        // Get the video URL from the videosArray
+                        const videoSrc = videosArray[index];
 
-                // Update the player's source
-                player.src({
-                    type: 'video/mp4',
-                    src: videoSrc
+                        // Update the player's source
+                        player.src({
+                            type: 'video/mp4',
+                            src: videoSrc
+                        });
+
+                        // Optionally, you can play the video automatically
+                        player.play();
+                    });
                 });
-
-                // Optionally, you can play the video automatically
-                player.play();
-            });
-        });
         })
         ;
-
-        function copyLink(link) {
-            var dummy = document.createElement('input');
-            document.body.appendChild(dummy);
-            dummy.value = link;
-            dummy.select();
-            document.execCommand('copy');
-            document.body.removeChild(dummy);
-            alert('Link copied to clipboard!'); // Optionally notify the user
-        }
     </script>
 @endpush

@@ -2,7 +2,40 @@
     @push('css')
 
         <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet"/>
+        <style>
+            /* Additional styles for buttons */
+            .action-button {
+                cursor: pointer;
+                padding: 8px 12px;
+                margin: 0 4px;
+                background-color: #f0f0f0;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+                transition: background-color 0.3s;
+            }
+            .action-button:hover {
+                background-color: #e0e0e0;
+            }
 
+            .action-button {
+                color: #7e7e7e; /* Text color */
+                transition: color 0.3s ease;
+            }
+
+            .action-button:hover {
+                color: #000; /* Text color on hover */
+            }
+            /* Dropdown menu styles */
+            .hidden {
+                display: none;
+            }
+            .action-menu {
+                min-width: 150px;
+                border: 1px solid #ccc;
+                background-color: #fff;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
+        </style>
     @endpush
     @push('script')
         <script src="https://vjs.zencdn.net/7.11.4/video.js"></script>
@@ -54,6 +87,26 @@
                 document.body.removeChild(dummy);
                 alert('Link copied to clipboard!'); // Optionally notify the user
             }
+
+            // Function to toggle the dropdown
+            function toggleDropdown(event, videoId) {
+                // Prevent this click from triggering the document's click event
+                event.stopPropagation();
+
+                let dropdown = document.getElementById(`dropdown-${videoId}`);
+                dropdown.classList.toggle('hidden');
+            }
+
+            // Event listener for clicking outside the dropdown
+            document.addEventListener('click', function (event) {
+                let dropdowns = document.querySelectorAll('.action-menu'); // Select all dropdowns
+                dropdowns.forEach(function (dropdown) {
+                    // If the click was outside the dropdown, and the dropdown is not hidden
+                    if (!dropdown.contains(event.target) && !dropdown.classList.contains('hidden')) {
+                        dropdown.classList.add('hidden'); // Hide the dropdown
+                    }
+                });
+            });
         </script>
 
         {{--        <script>--}}
@@ -204,7 +257,7 @@
                     data-setup='{}'
                 >
                     <!-- Source for the video file -->
-                    <source src="https://youtu.be/U5rLz5AZBIA" type="video/mp4"/>
+                    <source src="#" type="video/mp4"/>
 
                     <!-- Fallback message for browsers that do not support HTML5 video -->
                     <p class="vjs-no-js">
@@ -220,17 +273,16 @@
                 <!-- Add Video Button -->
                 <div class="mb-4 text-right">
                     <button @click="showModal = true"
-                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            class="action-button">
                         Add Video
                     </button>
                 </div>
                 <!-- List of Videos -->
                 <ul>
                     @foreach($videos as $video)
-                        <li class="video-item cursor-pointer mb-4 flex justify-between items-center hover:bg-gray-200 transition-all duration-200 ease-in-out border border-gray-300 rounded shadow-sm"
-                            data-video-src="{{ asset('storage/' . $video->path) }}">
+                        <li class="cursor-pointer mb-4 flex justify-between items-center border border-gray-300 rounded shadow-sm">
                             <!-- Thumbnail and Title -->
-                            <div class="flex items-center p-2 w-3/4">
+                            <div class="video-item flex items-center p-2">
                                 @if($video->thumbnail)
                                     <img src="{{ asset('storage/' . $video->thumbnail) }}" alt="Video Thumbnail"
                                          class="w-16 h-9 inline-block mr-2"/>
@@ -240,25 +292,40 @@
                                 @endif
                                 <span>{{$video->title}}</span>
                             </div>
-                            <div class="flex flex-col items-center p-2 justify-between h-full space-y-2">
-                                <!-- Generate Link Button -->
-                                <button onclick="copyLink('{{ asset('storage/' . $video->path) }}')"
-                                        class="text-white text-center bg-purple-400 hover:bg-purple-600 text-xs px-1 py-0.5 mb-1 rounded">
-                                    Copy Link
-                                </button>
 
-                                <!-- Delete Button -->
-                                <form action="{{ route('videos.destroy', $video->id) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                            class="text-white bg-red-500 hover:bg-red-700 text-xs px-1 py-0.5 rounded">
-                                        Delete
+                            <!-- Action Icon and Dropdown -->
+                            <div class="relative p-2 ">
+                                <button onclick="toggleDropdown(event, {{$video->id}})" id="action-icon-{{ $video->id }}" class="action-button text-gray-600 hover:text-gray-800">
+                                    <i class="fas fa-ellipsis-v"></i> <!-- Font Awesome ellipsis icon -->
+                                </button>
+                                <div class="absolute right-0 hidden z-10 action-menu" id="dropdown-{{ $video->id }}">
+                                    <!-- Generate Source Link Button -->
+                                    <button onclick="copyLink('{{ asset('storage/' . $video->path) }}')"
+                                            class="text-center bg-blue-400 hover:bg-blue-600 text-white w-full py-2 rounded-t text-sm">
+                                        Copy Source Link
                                     </button>
-                                </form>
+                                    <!-- Generate Video Link Button -->
+                                    <button onclick="copyLink('{{route('view.single.video' , $video->id)}}')"
+                                            class="text-center bg-green-400 hover:bg-green-600 text-white w-full py-2 text-sm">
+                                        Copy Video Link
+                                    </button>
+                                    <!-- Delete Button -->
+                                    <form action="{{ route('videos.destroy', $video->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                class="text-center text-white bg-red-400 hover:bg-red-600 text-sm w-full py-2 rounded-b">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
 
                         </li>
+
+
+
+
                     @endforeach
                 </ul>
 

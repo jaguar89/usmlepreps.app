@@ -61,7 +61,8 @@ class VideoController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $videos = Video::where('id' ,$id)->get();
+       return view('single-video' , ['videos' => $videos]);
     }
 
     /**

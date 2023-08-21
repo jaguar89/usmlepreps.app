@@ -21,6 +21,7 @@ Route::get('/', [\App\Http\Controllers\HomeController::class, 'index']);
 Route::get('/view-tasks/{id}', [\App\Http\Controllers\HomeController::class, 'viewSystemTasks'])->name('view.tests');
 Route::get('/view-single-task/{params}', [\App\Http\Controllers\HomeController::class, 'viewSingleTask'])->name('view.test.blank');
 Route::get('/view-all-videos',  [\App\Http\Controllers\HomeController::class, 'viewAllVideos'])->name('view.videos');
+Route::get('/view-single-video/{id}', [\App\Http\Controllers\VideoController::class, 'show'])->name('view.single.video');
 Route::get('/download-material/{test}',  [\App\Http\Controllers\TestController::class, 'downloadMaterial'])->name('download.material');
 
 
@@ -29,12 +30,6 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('admin')->group(function () {
         Route::get('/dashboard', function () {
-
-//            $user = \App\Models\User::find(2);
-//            $tests = \App\Models\Test::all();
-//            foreach ($tests as $test) {
-//                $user->tests()->attach($test->id, ['completed' => false]);
-//            }
             return view('dashboard');
         })->middleware(['verified'])->name('dashboard');
 

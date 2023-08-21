@@ -33,6 +33,7 @@
         .content-paragraph {
             max-width: 100%; /* Full width on small screens */
             overflow-wrap: break-word; /* Breaks long words */
+            word-break: break-all; /* Breaks the words at any character */
         }
 
         @media (min-width: 640px) {
@@ -47,6 +48,16 @@
             .content-paragraph {
                 /*max-width: 80%; !* You can adjust this value *!*/
             }
+        }
+
+          p a {
+            color: blue !important; /* Sets the color of the link text to blue */
+            text-decoration: underline !important; /* Underlines the link text */
+            display: inline-block; /* Allows overflow to be hidden */
+            max-width: 100%; /* Ensures link doesn't exceed container's width */
+            overflow: hidden; /* Hides overflow */
+            text-overflow: ellipsis; /* Adds ellipsis if text overflows */
+            white-space: nowrap; /* Prevents the text from wrapping onto the next line */
         }
 
         .tooltip-link {
@@ -66,7 +77,7 @@
             font-size: 0.875rem; /* Larger font size */
             white-space: nowrap;
             z-index: 10;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Adding a shadow for a bit of depth */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Adding a shadow for a bit of depth */
         }
 
     </style>
@@ -97,37 +108,42 @@
                     class="flex flex-col sm:flex-row  justify-between cursor-pointer mt-3"
                     onclick="toggleSection('section{{ $loop->index }}', 'icon{{ $loop->index }}')"
                 >
-                      <h1
-                          class="text-xl font-bold text-gray-600 flex flex-row items-center"
-                      >
-                          <!-- Your existing SVG and other content -->
-                          &nbsp {{$test->system->name}}
-                      </h1>
+                    <h1
+                        class="text-xl font-bold text-gray-600 flex flex-row items-center"
+                    >
+                        <!-- Your existing SVG and other content -->
+                        &nbsp {{$test->system->name}}
+                    </h1>
 
                     <span id="icon{{ $loop->index }}" class="hidden sm:block arrow-down"></span>
                 </div>
 
                 <div id="section{{ $loop->index }}" class="hidden flex flex-col space-y-4">
-                    <div class="flex flex-col sm:flex-row justify-between items-start space-y-2 sm:space-y-0">
-                        <div class="p-4 bg-gray-200 rounded">
-                             <p class="text-sm sm:text-base">
-                               Task Title:
-                            <div onclick="copyLink({{$test->id}}, '{{'title-' . $test->title}}')" data-tooltip="Generate URL" class="tooltip-link bg-amber-200 p-1 rounded hover:bg-amber-300 cursor-pointer">
-                                {{$test->title}}
-                            </div>
+                    <div class="flex flex-col  justify-between items-end space-y-2">
+                        <div class="w-full p-3 bg-gray-200 rounded">
+                            <p class="text-xs sm:text-sm">
+                                Task Title: {{$test->title}}
                             </p>
-
+                            <div class="flex items-center">
+                                <input type="text" value="{{route('view.test.blank', 'id='.$test->id.'&title='.$test->title)}}" disabled class="flex-grow border rounded p-1 text-xs text-gray-600 focus:outline-none">
+                                <button onclick="copyLink({{$test->id}}, '{{'title-' . $test->title}}')" class="ml-2 text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded focus:outline-none text-xs">
+                                    Copy URL
+                                </button>
+                            </div>
                         </div>
+
 
 
                     @auth()
                             @if(!auth()->user()->isAdmin() && !auth()->user()->tests()->where('test_id',$test->id)->wherePivot('completed', true)->exists())
                                 <button
-                                    onclick="completeTest({{$test->system_id}},{{$test->id}} , {{auth()->user()->id}})"
-                                    class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded-full text-xs ml-auto"
+                                    onclick="completeTest({{$test->system_id}},{{$test->id}},{{auth()->user()->id}})"
+                                    class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded-full text-xs ml-auto flex items-center"
                                 >
-                                    Complete
+                                    <i class="fas fa-check mr-1"></i>
+                                    Mark as complete
                                 </button>
+
                             @elseif(!auth()->user()->isAdmin())
                                 <div class="flex flex-row space-x-8">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none"
@@ -136,11 +152,13 @@
                                               d="M5 13l4 4L19 7"/>
                                     </svg>
                                     <button
-                                        onclick="incompleteTest({{$test->system_id}},{{$test->id}} , {{auth()->user()->id}})"
-                                        class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded-full text-xs ml-auto"
+                                        onclick="incompleteTest({{$test->system_id}},{{$test->id}},{{auth()->user()->id}})"
+                                        class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded-full text-xs ml-auto flex items-center"
                                     >
+                                        <i class="fas fa-times mr-1"></i>
                                         Incomplete Task
                                     </button>
+
                                 </div>
                             @endif
                         @endauth
@@ -319,16 +337,16 @@
                 });
         }
 
-        function copyLink(testId , title) {
-            var encodedTitle = encodeURIComponent('id='+testId +'&title='+ title);
+        function copyLink(testId, title) {
+            var encodedTitle = encodeURIComponent('id=' + testId + '&title=' + title);
             var baseUrl = window.location.protocol + '//' + window.location.host;
             var link = baseUrl + '/view-single-task/' + encodedTitle;
 
             // Now you can copy 'link' to the clipboard
             // Here's how you might do that:
-            navigator.clipboard.writeText(link).then(function() {
+            navigator.clipboard.writeText(link).then(function () {
                 console.log('Link copied to clipboard:', link);
-            }).catch(function(err) {
+            }).catch(function (err) {
                 console.error('Failed to copy link:', err);
             });
             alert('Link copied to clipboard!'); // Optionally notify the user

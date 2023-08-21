@@ -27,7 +27,7 @@
                         d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z"></path>
               </svg>
               &nbsp
-              Usmlepreps
+              Usmle Materials
           </a>
           <!-- Hamburger button, visible only on mobile -->
           <button class="sm:hidden p-2 focus:outline-none" id="menu-toggle">
@@ -83,7 +83,7 @@
 <!-- Footer -->
 <footer class="bg-teal-600 text-white p-4 mt-8">
     <div class="container mx-auto text-center">
-        &copy; 2023 Usmlepreps. All rights reserved.
+        &copy; 2023 Usmle Materials. All rights reserved.
     </div>
 </footer>
 @stack('script')

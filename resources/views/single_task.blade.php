@@ -1,5 +1,20 @@
 @extends('app')
 
+@push('css')
+
+    <style>
+        p a {
+            color: blue !important; /* Sets the color of the link text to blue */
+            text-decoration: underline !important; /* Underlines the link text */
+            display: inline-block; /* Allows overflow to be hidden */
+            max-width: 100%; /* Ensures link doesn't exceed container's width */
+            overflow: hidden; /* Hides overflow */
+            text-overflow: ellipsis; /* Adds ellipsis if text overflows */
+            white-space: nowrap; /* Prevents the text from wrapping onto the next line */
+        }
+
+    </style>
+@endpush
 
 @section('content')
 
@@ -19,75 +34,79 @@
         </div>
     @endif
 
-<div class="expandable-section p-4 bg-white shadow rounded mb-4" id="title">
-    <div
-        class="flex flex-col sm:flex-row  justify-between cursor-pointer mt-3"
-
-    >
-        <h1
-            class="text-xl font-bold text-gray-600 flex flex-row items-center"
-        >
-            <!-- Your existing SVG and other content -->
-            &nbsp {{$test->system->name}}
-        </h1>
-
-        <span id="icon" class="hidden sm:block arrow-down"></span>
-    </div>
-
-    <div id="section" class="flex flex-col space-y-4">
-        <div class="flex flex-col sm:flex-row justify-between items-start space-y-2 sm:space-y-0">
-            <div class="p-4 bg-gray-200 rounded">
-                <p class="text-sm sm:text-base">
-                    Task Title: {{$test->title}}
-                </p>
-            </div>
-
-
-            @auth()
-                @if(!auth()->user()->isAdmin() && !auth()->user()->tests()->where('test_id',$test->id)->wherePivot('completed', true)->exists())
-                    <button
-                        onclick="completeTest({{$test->system_id}},{{$test->id}} , {{auth()->user()->id}})"
-                        class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded-full text-xs ml-auto"
-                    >
-                        Complete
-                    </button>
-                @elseif(!auth()->user()->isAdmin())
-                    <div class="flex flex-row space-x-8">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none"
-                             viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                  d="M5 13l4 4L19 7"/>
-                        </svg>
-                        <button
-                            onclick="incompleteTest({{$test->system_id}},{{$test->id}} , {{auth()->user()->id}})"
-                            class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded-full text-xs ml-auto"
-                        >
-                            Incomplete Task
-                        </button>
-                    </div>
-                @endif
-            @endauth
-        </div>
-        <p class="mt-0 text-sm sm:text-base break-all overflow-hidden content-paragraph">
-            {!! $test->content !!}
-        </p>
+    <div class="container mx-auto p-4 bg-white shadow rounded mt-2 mb-4" id="title">
         <div
-            class="flex flex-col space-y-2 sm:space-y-0 sm:flex-row justify-between"
+            class="flex flex-col sm:flex-row  justify-between cursor-pointer mt-3"
+
         >
-            <a
-                onclick="createTestOnUsmlepreps({ ids: {{ json_encode( $test->questions_ids) }} })"
-                class="bg-green-500 w-full sm:w-auto text-center hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded text-sm sm:text-base"
-            >Create test on Usmlepreps</a
+            <h1
+                class="text-xl font-bold text-gray-600 flex flex-row items-center"
             >
-            <a
-                href="{{ route('download.material', ['test' => $test]) }}"
-                class="bg-green-500 w-full sm:w-auto text-center hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded text-sm sm:text-base flex items-center justify-center"
+                <!-- Your existing SVG and other content -->
+                &nbsp {{$test->system->name}}
+            </h1>
+
+            <span id="icon" class="hidden sm:block arrow-down"></span>
+        </div>
+
+        <div id="section" class="flex flex-col space-y-4">
+            <div class="flex flex-col  justify-between items-end space-y-2">
+                <div class="w-full p-3 bg-gray-200 rounded">
+                    <p class="text-xs sm:text-sm">
+                        Task Title: {{$test->title}}
+                    </p>
+                </div>
+
+
+                @auth()
+                    @if(!auth()->user()->isAdmin() && !auth()->user()->tests()->where('test_id',$test->id)->wherePivot('completed', true)->exists())
+                        <button
+                            onclick="completeTest({{$test->system_id}},{{$test->id}},{{auth()->user()->id}})"
+                            class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded-full text-xs ml-auto flex items-center"
+                        >
+                            <i class="fas fa-check mr-1"></i>
+                            Mark as complete
+                        </button>
+
+                    @elseif(!auth()->user()->isAdmin())
+                        <div class="flex flex-row space-x-8">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none"
+                                 viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                      d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <button
+                                onclick="incompleteTest({{$test->system_id}},{{$test->id}},{{auth()->user()->id}})"
+                                class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded-full text-xs ml-auto flex items-center"
+                            >
+                                <i class="fas fa-times mr-1"></i>
+                                Incomplete Task
+                            </button>
+
+                        </div>
+                    @endif
+                @endauth
+            </div>
+            <p class="mt-0 text-sm sm:text-base break-all overflow-hidden content-paragraph">
+                {!! $test->content !!}
+            </p>
+            <div
+                class="flex flex-col space-y-2 sm:space-y-0 sm:flex-row justify-between"
             >
-                <i class="fas fa-download mr-2"></i> View Materials
-            </a>
+                <a
+                    onclick="createTestOnUsmlepreps({ ids: {{ json_encode( $test->questions_ids) }} })"
+                    class="bg-green-500 w-full sm:w-auto text-center hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded text-sm sm:text-base"
+                >Create test on Usmlepreps</a
+                >
+                <a
+                    href="{{ route('download.material', ['test' => $test]) }}"
+                    class="bg-green-500 w-full sm:w-auto text-center hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded text-sm sm:text-base flex items-center justify-center"
+                >
+                    <i class="fas fa-download mr-2"></i> View Materials
+                </a>
+            </div>
         </div>
     </div>
-</div>
     <input type="hidden" name="request_api_url" id="request_api_url" value="{{env('REQUEST_USMLEPREPS_API_URL')}}">
 @endsection
 
@@ -196,7 +215,6 @@
                     console.error('An error occurred while marking the test as complete', error);
                 });
         }
-
 
 
     </script>

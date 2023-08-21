@@ -1,13 +1,4 @@
 <x-app-layout>
-    @push('script')
-        <script src="https://cdn.tiny.cloud/1/f15fyjs0mqpwpvbpsxvo34k1pw1c2u78dl59s6hlthrxli1e/tinymce/6/tinymce.min.js"
-                referrerpolicy="origin"></script>
-        <script>
-            tinymce.init({
-                selector: '#test-content',
-            });
-        </script>
-    @endpush
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
