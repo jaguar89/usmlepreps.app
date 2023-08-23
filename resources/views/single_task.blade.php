@@ -149,11 +149,11 @@
                         <i class="fas fa-check text-white"></i>
                     </div>
                 </div>
-{{--                <a--}}
-{{--                    onclick="createTestOnUsmlepreps({ ids: {{ json_encode( $test->questions_ids) }} })"--}}
-{{--                    class="bg-green-500 w-full sm:w-auto text-center hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded text-sm sm:text-base"--}}
-{{--                >Create test on Usmlepreps</a--}}
-{{--                >--}}
+                {{--                <a--}}
+                {{--                    onclick="createTestOnUsmlepreps({ ids: {{ json_encode( $test->questions_ids) }} })"--}}
+                {{--                    class="bg-green-500 w-full sm:w-auto text-center hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded text-sm sm:text-base"--}}
+                {{--                >Create test on Usmlepreps</a--}}
+                {{--                >--}}
                 <a
                     href="{{ route('download.material', ['test' => $test]) }}"
                     class="bg-green-500 w-full sm:w-auto text-center hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded text-sm sm:text-base flex items-center justify-center"
@@ -165,17 +165,18 @@
     </div>
     <input type="hidden" name="request_api_url" id="request_api_url" value="{{env('API_TO_SOLVE_TASK')}}">
     <input type="hidden" name="solved_api_url" id="solved_api_url" value="{{env('API_TO_CHECK_IF_SOLVED')}}">
-            <input type="hidden" name="email" id="email" value="{{auth()->user()->email}}">
-            <input type="hidden" name="task_id" id="task_id" value="{{$test->id}}">
+    <input type="hidden" name="email" id="email" value="{{auth()->check() ? auth()->user()->email : null}}">
+    <input type="hidden" name="task_id" id="task_id" value="{{$test->id}}">
 @endsection
 
 @push('script')
     <!-- JavaScript code to handle expandable sections -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const email = document.getElementById('email').value;
             const taskId = document.getElementById('task_id').value;
-            checkIfSolved(email,taskId);
+            if (email)
+                checkIfSolved(email, taskId);
         });
 
         function checkIfSolved(email, taskId) {
@@ -201,7 +202,7 @@
                 .then(response => response.json())
                 .then(data => {
                     // Find the circle element (update this selector if needed)
-                    const circleElement = document.getElementById('solve-status-circle-'+taskId);
+                    const circleElement = document.getElementById('solve-status-circle-' + taskId);
                     if (data.success) {
                         circleElement.style.backgroundColor = 'green';
                     } else {

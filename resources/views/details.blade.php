@@ -106,7 +106,7 @@
             <div class="expandable-section p-4 bg-white shadow rounded mb-4" id="title-{{$test->title}}">
                 <div
                     class="flex flex-col sm:flex-row  justify-between cursor-pointer mt-3"
-                    onclick="toggleSection('section{{ $loop->index }}', 'icon{{ $loop->index }}' , '{{auth()->user()->email}}','{{$test->id}}')"
+                    onclick="toggleSection('section{{ $loop->index }}', 'icon{{ $loop->index }}' ,'{{$test->id}}')"
                 >
                     <h1
                         class="text-xl font-bold text-gray-600 flex flex-row items-center"
@@ -249,7 +249,7 @@
 
         <input type="hidden" name="request_api_url" id="request_api_url" value="{{env('API_TO_SOLVE_TASK')}}">
         <input type="hidden" name="solved_api_url" id="solved_api_url" value="{{env('API_TO_CHECK_IF_SOLVED')}}">
-{{--        <input type="hidden" name="email" id="email" value="{{auth()->user()->email}}">--}}
+        <input type="hidden" name="email" id="email" value="{{auth()->check() ? auth()->user()->email : null}}">
 
     </div>
 
@@ -266,7 +266,7 @@
          */
 
 
-        function toggleSection(sectionId, iconId, email, taskId) {
+        function toggleSection(sectionId, iconId, taskId) {
             // Reference to all expandable sections
             const allSections = document.querySelectorAll(".expandable-section");
 
@@ -297,7 +297,9 @@
                 icon.classList.remove("arrow-down");
                 icon.classList.add("arrow-up");
             }
-            checkIfSolved(email, taskId);
+            const email = document.getElementById('email').value;
+            if (email)
+                checkIfSolved(email, taskId);
         }
 
         function checkIfSolved(email, taskId) {
@@ -323,7 +325,7 @@
                 .then(response => response.json())
                 .then(data => {
                     // Find the circle element (update this selector if needed)
-                    const circleElement = document.getElementById('solve-status-circle-'+taskId);
+                    const circleElement = document.getElementById('solve-status-circle-' + taskId);
                     if (data.success) {
                         circleElement.style.backgroundColor = 'green';
                     } else {
