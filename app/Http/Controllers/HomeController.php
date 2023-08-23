@@ -7,6 +7,8 @@ use App\Models\Test;
 use App\Models\User;
 use App\Models\Video;
 use Illuminate\Http\Request;
+use Illuminate\Log\Logger;
+use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
 {
@@ -32,6 +34,16 @@ class HomeController extends Controller
         return view('details', ['tests' => $tests]);
     }
 
+    public function viewTaskById($id , $task_id)
+    {
+        $test = Test::where('id', $task_id)->first();
+        if ($test) {
+            return response()->json($test);
+        } else {
+            return response()->json(['error' => 'Test not found'], 404);
+        }
+    }
+
     public function viewSingleTask($params)
     {
         parse_str(urldecode($params), $output);
@@ -45,5 +57,24 @@ class HomeController extends Controller
     {
         $videos = Video::paginate(15);
         return view('videos', ['videos' => $videos]);
+    }
+
+    public function ss(){
+        $test_id = \request()->get('taskId');
+        $user_email = \request()->get('email'); // Assuming you are sending the email as a parameter
+
+        $user = User::where('email', $user_email)->first();
+
+        if ($user) {
+            $test = $user->tests()->where('test_id', $test_id)->first();
+
+            if ($test) {
+                $completed = $test->pivot->completed;
+                return response()->json(['success' => $completed]);
+            }
+        }
+
+        return response()->json(['success' => false], 404); // Test not found or user not found
+
     }
 }

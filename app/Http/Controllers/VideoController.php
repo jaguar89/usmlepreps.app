@@ -98,4 +98,13 @@ class VideoController extends Controller
         }
         return redirect()->route('videos');
     }
+
+    public function getVideoTitle($id){
+        $video = Video::where('id', $id)->select('title')->get();
+        if ($video) {
+            return response()->json($video->title);
+        } else {
+            return response()->json(['error' => 'Test not found'], 404);
+        }
+    }
 }

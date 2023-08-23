@@ -17,11 +17,16 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::get('/', [\App\Http\Controllers\HomeController::class, 'index']);
+Route::get('/', function (){
+    return redirect('/app');
+});
+Route::get('/app', [\App\Http\Controllers\HomeController::class, 'index']);
 Route::get('/view-tasks/{id}', [\App\Http\Controllers\HomeController::class, 'viewSystemTasks'])->name('view.tests');
+//Route::get('/view-tasks/{id}/{task_id}', [\App\Http\Controllers\HomeController::class, 'viewTaskById'])->name('view.single.tests');
 Route::get('/view-single-task/{params}', [\App\Http\Controllers\HomeController::class, 'viewSingleTask'])->name('view.test.blank');
 Route::get('/view-all-videos',  [\App\Http\Controllers\HomeController::class, 'viewAllVideos'])->name('view.videos');
 Route::get('/view-single-video/{id}', [\App\Http\Controllers\VideoController::class, 'show'])->name('view.single.video');
+Route::get('/get-video-title/{id}', [\App\Http\Controllers\VideoController::class, 'getVideoTitle'])->name('get.video.title');
 Route::get('/download-material/{test}',  [\App\Http\Controllers\TestController::class, 'downloadMaterial'])->name('download.material');
 
 
