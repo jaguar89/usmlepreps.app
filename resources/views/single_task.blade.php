@@ -96,57 +96,61 @@
                 }
                 $content = $test->content;
 
+                // Match the entire pattern including the <strong> and <span> tags, and replace with the desired div
                 $content = preg_replace_callback(
-                    '/<span style="font-size: 18pt;"><strong><span style="color: rgb\(132, 63, 161\);"><a href="..\/..\/view-single-video\/(\d+)" target="_blank" rel="noopener">.*?<\/a><\/span><\/strong><\/span>/',
+                    '/<span style="font-size: 18pt;"><strong><span style="color: rgb\(132, 63, 161\);"><a [^>]*href=".*?\/view-single-video\/(\d+).*?"[^>]*>.*?<\/a><\/span><\/strong><\/span>/',
                     function ($matches) {
+                        // Get the videoId from the URL
                         $videoId = $matches[1];
+
                         $videoTitle = getVideoTitle($videoId);
                         $replacement = '
-                                    <div class="flex flex-row items-center w-full bg-white shadow-md rounded-lg p-4 hover:bg-gray-50 transition-all">
-                                        <h3 class="flex-grow text-gray-700 font-semibold">' . $videoTitle . '</h3>
-                                        <a href="http://127.0.0.1:8000/view-single-video/' . $videoId . '" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mr-2 flex items-center" onclick="changeStatusCircle(this)">
-                                            <i class="fas fa-play mr-2"></i> Play
-                                        </a>
-                                        <div id="status-circle-' . $videoId . '" class="w-5 h-5 bg-gray-400 rounded-full flex justify-center items-center">
-                                            <i id="check-' . $videoId . '" class="fas fa-check text-white"></i>
-                                        </div>
-                                    </div>
-                                    <script>
-                                        function changeStatusCircle(el) {
-                                            // Finding the sibling element with the id that starts with "status-circle-"
-                                            var statusCircle = el.parentElement.querySelector("[id^=\'status-circle-\']");
-                                            var checkmark = el.parentElement.querySelector("[id^=\'check-\']");
-                                            if (statusCircle && checkmark) {
-                                                statusCircle.style.backgroundColor = "green"; // Changing the color to green
-                                                checkmark.hidden = false; // Revealing the checkmark
-                                            }
-                                        }
-                                    </script>
-                                    ';
+                <div class="flex flex-row items-center w-full bg-white shadow-md rounded-lg p-4 hover:bg-gray-50 transition-all">
+                    <h3 class="flex-grow text-gray-700 font-semibold">' . $videoTitle . '</h3>
+                    <a href="' . env("APP_URL") . '/view-single-video/' . $videoId . '" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mr-2 flex items-center" onclick="changeStatusCircle(this)">
+                        <i class="fas fa-play mr-2"></i> Play
+                    </a>
+                    <div id="status-circle-' . $videoId . '" class="w-5 h-5 bg-gray-400 rounded-full flex justify-center items-center p-3">
+                        <i id="check-' . $videoId . '" class="fas fa-check text-white"></i>
+                    </div>
+                </div>
+                <script>
+                    function changeStatusCircle(el) {
+                        // Finding the sibling element with the id that starts with "status-circle-"
+                        var statusCircle = el.parentElement.querySelector("[id^=\'status-circle-\']");
+                        var checkmark = el.parentElement.querySelector("[id^=\'check-\']");
+                        if (statusCircle && checkmark) {
+                            statusCircle.style.backgroundColor = "green"; // Changing the color to green
+                            checkmark.hidden = false; // Revealing the checkmark
+                        }
+                    }
+                </script>
+                ';
                         return $replacement;
                     },
                     $content
                 );
-
                 ?>
 
             <p class="mt-0 text-sm sm:text-base break-all overflow-hidden content-paragraph">
                 {!! $content !!}
             </p>
             <div
-                class="flex flex-col space-y-2 sm:space-y-0 sm:flex-row justify-between"
+                class="flex flex-col  space-y-2 space-x-0 sm:space-x-2 justify-between items-center"
             >
                 <div
-                    class="flex flex-row items-center bg-white shadow-md rounded-lg p-2 hover:bg-gray-50 transition-all text-sm sm:text-base">
+                    class="w-full flex flex-row justify-between items-center bg-gray-200 shadow-sm p-2 transition-all text-sm sm:text-base">
                     <span class="text-gray-700 font-semibold">Solve UWorld Questions</span>
-                    <button
-                        onclick="createTestOnUsmlepreps({ ids: {{ json_encode( $test->questions_ids) }} })"
-                        class="bg-green-500 w-full sm:w-auto text-center hover:bg-green-400 text-white font-bold py-1 px-2 border-b-2 border-green-700 hover:border-green-500 rounded text-xs sm:text-sm ml-2"
-                    >Solve
-                    </button>
-                    <div id="solve-status-circle-{{$test->id}}"
-                         class="w-4 h-4 bg-gray-400 rounded-full flex justify-center items-center ml-2">
-                        <i class="fas fa-check text-white"></i>
+                    <div class="flex items-center">
+                        <button
+                            onclick="createTestOnUsmlepreps({ ids: {{ json_encode($test->questions_ids) }} })"
+                            class="bg-green-500 w-full sm:w-auto text-center hover:bg-green-400 text-white font-bold py-1 px-2 border-b-2 border-green-700 hover:border-green-500 rounded text-xs sm:text-sm"
+                        >Solve
+                        </button>
+                        <div id="solve-status-circle-{{$test->id}}"
+                             class="w-4 h-4 bg-gray-400 rounded-full flex justify-center items-center p-3 ml-2"> <!-- Adjusted padding -->
+                            <i class="fas fa-check text-white"></i>
+                        </div>
                     </div>
                 </div>
                 {{--                <a--}}
