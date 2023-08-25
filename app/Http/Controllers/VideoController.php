@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Video;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class VideoController extends Controller
@@ -53,6 +55,8 @@ class VideoController extends Controller
         $video->thumbnail = $thumbnail;
         $video->save();
 
+        $this->assignAllUserstoVideo($video);
+
         return redirect()->route('videos')->with('success', 'A new Video was added successfully!');
     }
 
@@ -61,8 +65,8 @@ class VideoController extends Controller
      */
     public function show(string $id)
     {
-        $videos = Video::where('id' ,$id)->get();
-       return view('single-video' , ['videos' => $videos]);
+        $videos = Video::where('id', $id)->get();
+        return view('single-video', ['videos' => $videos]);
     }
 
     /**
@@ -87,9 +91,9 @@ class VideoController extends Controller
     public function destroy(string $id)
     {
         $video = Video::find($id);
-        if($video){
+        if ($video) {
             $thumbnail = $video->thumbnail;
-            if($thumbnail && Storage::disk('public')->exists($thumbnail)){
+            if ($thumbnail && Storage::disk('public')->exists($thumbnail)) {
                 Storage::disk('public')->delete($thumbnail);
             }
             Storage::disk('public')->delete($video->path);
@@ -99,12 +103,30 @@ class VideoController extends Controller
         return redirect()->route('videos');
     }
 
-    public function getVideoTitle($id){
+    public function getVideoTitle($id)
+    {
         $video = Video::where('id', $id)->select('title')->get();
         if ($video) {
             return response()->json($video->title);
         } else {
             return response()->json(['error' => 'Test not found'], 404);
         }
+    }
+
+    private function assignAllUserstoVideo(Video $video)
+    {
+        $users = User::all();
+        foreach ($users as $user) {
+            $user->videos()->attach($video->id , ['watched' => false]);
+        }
+    }
+
+    public function markVideoAsWatched($id){
+        $user = Auth::user();
+        $video = $user->videos()->where('video_id' , $id)->first();
+        if($video)
+            $user->videos()->updateExistingPivot($video->pivot->video_id , ['watched' => true]);
+
+        return response()->json(true);
     }
 }

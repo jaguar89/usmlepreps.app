@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,24 +16,20 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-
-
-Route::get('/', function (){
+Route::get('/', function () {
     return redirect('/app');
 });
 Route::get('/app', [\App\Http\Controllers\HomeController::class, 'index']);
 Route::get('/view-tasks/{id}', [\App\Http\Controllers\HomeController::class, 'viewSystemTasks'])->name('view.tests');
-//Route::get('/view-tasks/{id}/{task_id}', [\App\Http\Controllers\HomeController::class, 'viewTaskById'])->name('view.single.tests');
 Route::get('/view-single-task/{params}', [\App\Http\Controllers\HomeController::class, 'viewSingleTask'])->name('view.test.blank');
-Route::get('/view-all-videos',  [\App\Http\Controllers\HomeController::class, 'viewAllVideos'])->name('view.videos');
+Route::get('/view-all-videos', [\App\Http\Controllers\HomeController::class, 'viewAllVideos'])->name('view.videos');
 Route::get('/view-single-video/{id}', [\App\Http\Controllers\VideoController::class, 'show'])->name('view.single.video');
 Route::get('/get-video-title/{id}', [\App\Http\Controllers\VideoController::class, 'getVideoTitle'])->name('get.video.title');
-Route::get('/download-material/{test}',  [\App\Http\Controllers\TestController::class, 'downloadMaterial'])->name('download.material');
+Route::post('/mark-video-as-watched/{id}', [\App\Http\Controllers\VideoController::class, 'markVideoAsWatched']);
+Route::get('/download-material/{test}', [\App\Http\Controllers\TestController::class, 'downloadMaterial'])->name('download.material');
 
 
 Route::middleware('auth')->group(function () {
-
-
     Route::middleware('admin')->group(function () {
         Route::get('/dashboard', function () {
             return view('dashboard');
@@ -43,11 +40,19 @@ Route::middleware('auth')->group(function () {
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
         Route::get('/systems', [\App\Http\Controllers\SystemController::class, 'index'])->name('systems');
-        Route::get('/systems/create', [\App\Http\Controllers\SystemController::class, 'create'])->name('systems.create');
+        Route::get('/systems/create', [\App\Http\Controllers\SystemController::class, 'create'])->name(
+            'systems.create'
+        );
         Route::post('/systems', [\App\Http\Controllers\SystemController::class, 'store'])->name('systems.store');
-        Route::put('/systems/{system}', [\App\Http\Controllers\SystemController::class, 'update'])->name('systems.update');
-        Route::get('/systems/edit/{system}', [\App\Http\Controllers\SystemController::class, 'edit'])->name('systems.edit');
-        Route::delete('/systems/{system}', [\App\Http\Controllers\SystemController::class, 'destroy'])->name('systems.destroy');
+        Route::put('/systems/{system}', [\App\Http\Controllers\SystemController::class, 'update'])->name(
+            'systems.update'
+        );
+        Route::get('/systems/edit/{system}', [\App\Http\Controllers\SystemController::class, 'edit'])->name(
+            'systems.edit'
+        );
+        Route::delete('/systems/{system}', [\App\Http\Controllers\SystemController::class, 'destroy'])->name(
+            'systems.destroy'
+        );
 
         Route::get('/tests', [\App\Http\Controllers\TestController::class, 'index'])->name('tests');
         Route::get('/tests/create', [\App\Http\Controllers\TestController::class, 'create'])->name('tests.create');
@@ -59,15 +64,18 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/videos', [\App\Http\Controllers\VideoController::class, 'index'])->name('videos');
         Route::post('/videos', [\App\Http\Controllers\VideoController::class, 'store'])->name('videos.create');
-        Route::delete('/videos/{id}', [\App\Http\Controllers\VideoController::class, 'destroy'])->name('videos.destroy');
-
+        Route::delete('/videos/{id}', [\App\Http\Controllers\VideoController::class, 'destroy'])->name(
+            'videos.destroy'
+        );
     });
 
     Route::get('/tests/{id}', [\App\Http\Controllers\TestController::class, 'show']);
-    Route::post('/complete-test/{testId}', [\App\Http\Controllers\TestController::class, 'completeTest'])->name('complete.test');
-    Route::post('/incomplete-test/{testId}', [\App\Http\Controllers\TestController::class, 'incompleteTest'])->name('complete.test');
-
-
+    Route::post('/complete-test/{testId}', [\App\Http\Controllers\TestController::class, 'completeTest'])->name(
+        'complete.test'
+    );
+    Route::post('/incomplete-test/{testId}', [\App\Http\Controllers\TestController::class, 'incompleteTest'])->name(
+        'complete.test'
+    );
 });
 
 require __DIR__ . '/auth.php';

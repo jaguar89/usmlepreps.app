@@ -34,7 +34,7 @@ class HomeController extends Controller
         return view('details', ['tests' => $tests]);
     }
 
-    public function viewTaskById($id , $task_id)
+    public function viewTaskById($id, $task_id)
     {
         $test = Test::where('id', $task_id)->first();
         if ($test) {
@@ -59,22 +59,23 @@ class HomeController extends Controller
         return view('videos', ['videos' => $videos]);
     }
 
-    public function ss(){
-        $test_id = \request()->get('taskId');
-        $user_email = \request()->get('email'); // Assuming you are sending the email as a parameter
-
-        $user = User::where('email', $user_email)->first();
-
-        if ($user) {
-            $test = $user->tests()->where('test_id', $test_id)->first();
-
-            if ($test) {
-                $completed = $test->pivot->completed;
-                return response()->json(['success' => $completed]);
-            }
-        }
-
-        return response()->json(['success' => false], 404); // Test not found or user not found
-
+    public function ss()
+    {
+//        $test_id = \request()->get('taskId');
+//        $user_email = \request()->get('email');
+//
+//        $user = User::where('email', $user_email)->first();
+//
+//        if ($user) {
+//
+//            $test = $user->tests()->wherePivot('test_id', $test_id)->first();
+//
+//            if ($test) {
+//
+//                $user->tests()->updateExistingPivot($test_id, ['solved' => true]);
+//                return response()->json(['success' => true]);
+//            }
+//        }
+        return response()->json(['success' => true , 'completed' => false]);
     }
 }

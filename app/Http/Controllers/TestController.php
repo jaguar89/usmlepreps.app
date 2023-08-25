@@ -129,29 +129,53 @@ class TestController extends Controller
 
     public function completeTest($testId)
     {
+//        if (!$user->tests->contains($testId)) {
+//            // Pivot record doesn't exist, so attach a new one
+//            $user->tests()->attach($testId, ['completed' => true]);
+//        } else {
+//            // Pivot record exists, so update the existing pivot
+//            $user->tests()->updateExistingPivot($testId, ['completed' => true]);
+//        }
+
         $userId = \request('user_id');
-        if (!$userId == Auth::user()->id) {
+
+        // Check if the user ID from the request matches the authenticated user's ID
+        if ($userId != Auth::user()->id) {
             return response()->json(false);
         }
+
         $user = User::find($userId);
-        if (!$user->tests->contains($testId)) {
-            // Pivot record doesn't exist, so attach a new one
-            $user->tests()->attach($testId, ['completed' => true]);
-        } else {
-            // Pivot record exists, so update the existing pivot
+
+        // Check if a pivot record exists for the given test ID
+        $test = $user->tests()->wherePivot('test_id', $testId)->first();
+
+        // If the pivot record exists and is marked as solved, update the 'completed' value
+        if ($test && $test->pivot->solved) {
             $user->tests()->updateExistingPivot($testId, ['completed' => true]);
         }
+
         return ['systemId' => \request('system_id')];
     }
 
     public function incompleteTest($testId)
     {
         $userId = \request('user_id');
-        if (!$userId == Auth::user()->id) {
+
+        // Check if the user ID from the request matches the authenticated user's ID
+        if ($userId != Auth::user()->id) {
             return response()->json(false);
         }
+
         $user = User::find($userId);
-        $user->tests()->updateExistingPivot($testId, ['completed' => false]);
+
+        // Check if a pivot record exists for the given test ID
+        $test = $user->tests()->wherePivot('test_id', $testId)->first();
+
+        // If the pivot record exists and is marked as solved, update the 'completed' value
+        if ($test && $test->pivot->solved) {
+            $user->tests()->updateExistingPivot($testId, ['completed' => false]);
+        }
+
         return ['systemId' => \request('system_id')];
     }
 
@@ -159,7 +183,7 @@ class TestController extends Controller
     {
         $users = User::where('is_admin', false)->get();
         foreach ($users as $user) {
-            $user->tests()->attach($test->id, ['completed' => false]);
+            $user->tests()->attach($test->id, ['solved' => false ,'completed' => false]);
         }
     }
 

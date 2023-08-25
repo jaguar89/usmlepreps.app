@@ -11,4 +11,8 @@ class Video extends Model
 
     protected $fillable = ['path', 'title' , 'thumbnail'];
 
+    public function users(){
+        return $this->belongsToMany(User::class)->withPivot('watched')->withTimestamps();
+    }
+
 }

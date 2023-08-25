@@ -58,79 +58,87 @@
                 </div>
 
 
-                @auth()
-                    @if(!auth()->user()->isAdmin() && !auth()->user()->tests()->where('test_id',$test->id)->wherePivot('completed', true)->exists())
-                        <button
-                            onclick="completeTest({{$test->system_id}},{{$test->id}},{{auth()->user()->id}})"
-                            class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded-full text-xs ml-auto flex items-center"
-                        >
-                            <i class="fas fa-check mr-1"></i>
-                            Mark as complete
-                        </button>
+{{--                @auth()--}}
+{{--                    @if(!auth()->user()->isAdmin() && !auth()->user()->tests()->where('test_id',$test->id)->wherePivot('completed', true)->exists())--}}
+                        <div class="hidden" id="completeButtonContainer{{$test->id}}">
+                            <button
+                                onclick="completeTest({{$test->system_id}},{{$test->id}},{{auth()->user()->id}})"
+                                class="bg-green-500 hover:bg-green-600 text-white font-bold p-2 rounded-full ml-auto flex items-center"
+                            >
+                                <i class="fas fa-check mr-2"></i>
+                                Mark as complete
+                            </button>
+                        </div>
 
-                    @elseif(!auth()->user()->isAdmin())
-                        <div class="flex flex-row space-x-8">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none"
+{{--                    @elseif(!auth()->user()->isAdmin())--}}
+                        <div class="hidden flex flex-row items-center space-x-8" id="incompleteButtonContainer{{$test->id}}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-500" fill="none"
                                  viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                <path strokeLinecap="round" strokeLinejoin="round" style="stroke-width:4;"
                                       d="M5 13l4 4L19 7"/>
                             </svg>
+
+
                             <button
                                 onclick="incompleteTest({{$test->system_id}},{{$test->id}},{{auth()->user()->id}})"
-                                class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded-full text-xs ml-auto flex items-center"
+                                class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-full ml-auto flex items-center"
                             >
-                                <i class="fas fa-times mr-1"></i>
+                                <i class="fas fa-times mr-2"></i>
                                 Incomplete Task
                             </button>
 
                         </div>
-                    @endif
-                @endauth
+{{--                    @endif--}}
+{{--                @endauth--}}
             </div>
-                <?php
-                if (!function_exists('getVideoTitle')) {
-                    function getVideoTitle($videoId) {
-                        $video = \App\Models\Video::find($videoId);
-                        return $video ? $video->title : 'Video not found';
+            <?php
+            if (!function_exists('isVideoWatched')) {
+                function isVideoWatched($videoId) {
+                    $user = auth()->user();
+                    if (!$user) {
+                        return false; // Not authenticated
                     }
+
+                    return $user->videos()
+                        ->where('video_id', $videoId)
+                        ->wherePivot('watched', true)
+                        ->exists();
                 }
-                $content = $test->content;
+            }
+            if (!function_exists('getVideoTitle')) {
+                function getVideoTitle($videoId) {
+                    $video = \App\Models\Video::find($videoId);
+                    return $video ? $video->title : 'Video not found';
+                }
+            }
+            $content = $test->content;
 
-                // Match the entire pattern including the <strong> and <span> tags, and replace with the desired div
-                $content = preg_replace_callback(
-                    '/<span style="font-size: 18pt;"><strong><span style="color: rgb\(132, 63, 161\);"><a [^>]*href=".*?\/view-single-video\/(\d+).*?"[^>]*>.*?<\/a><\/span><\/strong><\/span>/',
-                    function ($matches) {
-                        // Get the videoId from the URL
-                        $videoId = $matches[1];
+            // Match the entire pattern including the <strong> and <span> tags, and replace with the desired div
+            $content = preg_replace_callback(
+                '/<span style="font-size: 18pt;"><strong><span style="color: rgb\(132, 63, 161\);"><a [^>]*href=".*?\/view-single-video\/(\d+).*?"[^>]*>.*?<\/a><\/span><\/strong><\/span>/',
+                function ($matches) {
+                    // Get the videoId from the URL
+                    $videoId = $matches[1];
 
-                        $videoTitle = getVideoTitle($videoId);
-                        $replacement = '
+                    $videoTitle = getVideoTitle($videoId);
+                    $replacement = '
                 <div class="flex flex-row items-center w-full bg-white shadow-md rounded-lg p-4 hover:bg-gray-50 transition-all">
                     <h3 class="flex-grow text-gray-700 font-semibold">' . $videoTitle . '</h3>
-                    <a href="' . env("APP_URL") . '/view-single-video/' . $videoId . '" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mr-2 flex items-center" onclick="changeStatusCircle(this)">
+                    <a href="' . env(
+                            "APP_URL"
+                        ) . '/view-single-video/' . $videoId . '" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mr-2 flex items-center" onclick="changeStatusCircle(this,' . $videoId . ')">
                         <i class="fas fa-play mr-2"></i> Play
                     </a>
-                    <div id="status-circle-' . $videoId . '" class="w-5 h-5 bg-gray-400 rounded-full flex justify-center items-center p-3">
+                    <div id="status-circle-' . $videoId . '" class="w-5 h-5 '.(isVideoWatched($videoId) ? 'bg-green-400' : 'bg-gray-400').' rounded-full flex justify-center items-center p-3">
                         <i id="check-' . $videoId . '" class="fas fa-check text-white"></i>
                     </div>
                 </div>
-                <script>
-                    function changeStatusCircle(el) {
-                        // Finding the sibling element with the id that starts with "status-circle-"
-                        var statusCircle = el.parentElement.querySelector("[id^=\'status-circle-\']");
-                        var checkmark = el.parentElement.querySelector("[id^=\'check-\']");
-                        if (statusCircle && checkmark) {
-                            statusCircle.style.backgroundColor = "green"; // Changing the color to green
-                            checkmark.hidden = false; // Revealing the checkmark
-                        }
-                    }
-                </script>
                 ';
-                        return $replacement;
-                    },
-                    $content
-                );
-                ?>
+                    return $replacement;
+                },
+                $content
+            );
+            ?>
 
             <p class="mt-0 text-sm sm:text-base break-all overflow-hidden content-paragraph">
                 {!! $content !!}
@@ -138,20 +146,43 @@
             <div
                 class="flex flex-col  space-y-2 space-x-0 sm:space-x-2 justify-between items-center"
             >
+                {{--                        large screen view--}}
                 <div
-                    class="w-full flex flex-row justify-between items-center bg-gray-200 shadow-sm p-2 transition-all text-sm sm:text-base">
-                    <span class="text-gray-700 font-semibold">Solve UWorld Questions</span>
+                    class="hidden sm:flex w-full flex-row justify-between items-center bg-gray-200 shadow-sm p-6 transition-all text-sm sm:text-base">
+                    <span class="w-1/2 text-gray-700 font-semibold">Solve UWorld Questions</span>
                     <div class="flex items-center">
                         <button
                             onclick="createTestOnUsmlepreps({ ids: {{ json_encode($test->questions_ids) }} })"
-                            class="bg-green-500 w-full sm:w-auto text-center hover:bg-green-400 text-white font-bold py-1 px-2 border-b-2 border-green-700 hover:border-green-500 rounded text-xs sm:text-sm"
-                        >Solve
+                            class="bg-green-500 w-full sm:w-auto text-center hover:bg-green-400 text-white font-bold py-3 px-4 border-b-4 border-green-700 hover:border-green-500 rounded text-xs sm:text-sm flex items-center justify-center space-x-2"
+                        >
+                            <i class="fas fa-lightbulb mr-2"></i> <!-- The lightbulb icon -->
+                            Solve
                         </button>
                         <div id="solve-status-circle-{{$test->id}}"
-                             class="w-4 h-4 bg-gray-400 rounded-full flex justify-center items-center p-3 ml-2"> <!-- Adjusted padding -->
+                             class="w-1/2 w-4 h-4 bg-gray-400 rounded-full flex justify-center items-center p-3 ml-2">
+                            <!-- Adjusted padding -->
                             <i class="fas fa-check text-white"></i>
                         </div>
                     </div>
+                </div>
+                {{--                        mobile view--}}
+                <div
+                    class="w-full flex flex-col space-y-4 sm:hidden items-center bg-gray-200 shadow-sm p-3 transition-all text-sm sm:text-base">
+                    <div class="flex w-full items-center justify-between p-2">
+                        <span class="text-gray-700 font-semibold">Solve UWorld Questions</span>
+                        <div id="solve-status-circle-mobile-{{$test->id}}"
+                             class="w-4 h-4 bg-gray-400 rounded-full flex justify-center items-center p-3 ml-2">
+                            <!-- Adjusted padding -->
+                            <i class="fas fa-check text-white"></i>
+                        </div>
+                    </div>
+                    <button
+                        onclick="createTestOnUsmlepreps({ ids: {{ json_encode($test->questions_ids) }} })"
+                        class="bg-green-500 w-full sm:w-auto text-center hover:bg-green-400 text-white font-bold py-2 px-3 border-b-4 border-green-700 hover:border-green-500 rounded text-xs sm:text-sm flex items-center justify-center space-x-2"
+                    >
+                        <i class="fas fa-lightbulb mr-2"></i> <!-- The lightbulb icon -->
+                        Solve
+                    </button>
                 </div>
                 {{--                <a--}}
                 {{--                    onclick="createTestOnUsmlepreps({ ids: {{ json_encode( $test->questions_ids) }} })"--}}
@@ -183,9 +214,36 @@
                 checkIfSolved(email, taskId);
         });
 
+        // this function changes circle color for watched videos
+        function changeStatusCircle(el, videoId) {
+            const url = '/mark-video-as-watched/' + videoId;
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Include CSRF token if you're using Laravel
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+            };
+            fetch(url , options)
+                .then(response => response.json())
+                .then(data => {
+                    const statusCircle = document.getElementById('status-circle-' + videoId);
+                    if (!statusCircle.classList.contains('bg-green-400')) {
+                        statusCircle.classList.remove('bg-gray-400');
+                        statusCircle.classList.add('bg-green-400');
+                    }
+
+                })
+                .catch(error => {
+                    // Handle error
+                    console.error('An error occurred while marking the video as watched', error);
+                });
+        }
+
         function checkIfSolved(email, taskId) {
-            const url = document.getElementById('solved_api_url').value;
-            // const url = '/api/check-solved';
+            // const url = document.getElementById('solved_api_url').value;
+            const url = '/api/check-solved';
             console.log(url);
             const data = {
                 email: email,
@@ -207,8 +265,15 @@
                 .then(data => {
                     // Find the circle element (update this selector if needed)
                     const circleElement = document.getElementById('solve-status-circle-' + taskId);
+                    const circleElementMobile = document.getElementById('solve-status-circle-mobile-' + taskId);
                     if (data.success) {
                         circleElement.style.backgroundColor = 'green';
+                        circleElementMobile.style.backgroundColor = 'green';
+                        if(data.completed) {
+                            document.getElementById('incompleteButtonContainer' + taskId).classList.toggle('hidden');
+                        }else{
+                            document.getElementById('completeButtonContainer' + taskId).classList.toggle('hidden');
+                        }
                     } else {
                         // Handle failure case if needed
                     }

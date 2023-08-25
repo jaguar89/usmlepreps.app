@@ -17,7 +17,7 @@ class Test extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class)->withPivot('completed')->withTimestamps();
+        return $this->belongsToMany(User::class)->withPivot('solved', 'completed')->withTimestamps();
     }
 
 

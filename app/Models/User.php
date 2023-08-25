@@ -45,7 +45,11 @@ class User extends Authenticatable
 
     public function tests()
     {
-        return $this->belongsToMany(Test::class)->withPivot('completed')->withTimestamps();
+        return $this->belongsToMany(Test::class)->withPivot('solved', 'completed')->withTimestamps();
+    }
+
+    public function videos(){
+        return $this->belongsToMany(Video::class)->withPivot('watched')->withTimestamps();
     }
 
     public function isAdmin(){
