@@ -76,6 +76,6 @@ class HomeController extends Controller
 //                return response()->json(['success' => true]);
 //            }
 //        }
-        return response()->json(['success' => true , 'completed' => false]);
+        return response()->json(['success' => true , 'completed' => true]);
     }
 }

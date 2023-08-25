@@ -40,7 +40,8 @@ class TestController extends Controller
             'title' => 'required|string',
             'test_content' => 'required|string',
             'material' => 'nullable|file|mimes:zip,rar',
-            'questions_ids' => 'nullable|string|regex:/^\d+(,\d+)*$/',
+//            'questions_ids' => 'nullable|string|regex:/^\d+(,\d+)*$/',
+            'questions_ids' => 'nullable|string',
 
         ]);
 
