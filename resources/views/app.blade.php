@@ -5,12 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Laravel</title>
+    <title>Usmle Materials</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700"
+        rel="stylesheet"
+    />
 
     @vite('resources/css/app.css')
     @stack('css')
@@ -20,13 +24,17 @@
 <nav class="flex flex-col sm:flex-row justify-between bg-teal-600 p-4 px-10">
 {{--    <div class="container mx-auto flex flex-col sm:flex-row items-center justify-between">--}}
       <div  class="flex flex-row justify-between">
-          <a href="{{url('/')}}" class="text-white text-2xl font-bold flex flex-row items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                   stroke="currentColor" class="w-6 h-6">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z"></path>
+          <a href="{{url('/')}}" class="font-source-sans-pro text-white text-2xl lg:text-4xl font-bold flex flex-row items-center font">
+              <svg
+                  class="h-8 fill-current inline"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+              >
+                  <path d="M0 0h24v24H0z" fill="none" />
+                  <path
+                      d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm0 18H6V4h2v8l2.5-1.5L13 12V4h5v16z"
+                  />
               </svg>
-              &nbsp
               Usmle Materials
           </a>
           <!-- Hamburger button, visible only on mobile -->

@@ -17,9 +17,9 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', function () {
-    return redirect('/app');
+    return view('index');
 });
-Route::get('/app', [\App\Http\Controllers\HomeController::class, 'index']);
+Route::get('/app', [\App\Http\Controllers\HomeController::class, 'index'])->name('app');
 Route::get('/view-tasks/{id}', [\App\Http\Controllers\HomeController::class, 'viewSystemTasks'])->name('view.tests');
 Route::get('/view-single-task/{params}', [\App\Http\Controllers\HomeController::class, 'viewSingleTask'])->name('view.test.blank');
 Route::get('/view-all-videos', [\App\Http\Controllers\HomeController::class, 'viewAllVideos'])->name('view.videos');
